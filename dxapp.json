@@ -8,19 +8,64 @@
   "dxapi": "1.0.0",
   "inputSpec": [
     {
-      "name": "input",
-      "label": "label",
-      "help": "help",
-      "class": "string",
+      "name": "input_bam",
+      "label": "Input BAM alignment",
+      "help": "Input BAM alignment",
+      "class": "file",
+      "patterns": ["*.bam"],
+      "optional": false
+    },
+    {
+      "name": "input_bam_index",
+      "label": "Input BAM index file",
+      "help": "Input BAM index file",
+      "class": "file",
+      "patterns": ["*.bai"],
+      "optional": false
+    },
+    {
+      "name": "reference_fasta",
+      "label": "reference fasta",
+      "help": "A single fasta file containing reference Genome contigs BAMS were aligned to (see GATK reference bundles)",
+      "class": "file",
+      "optional": false
+    },
+    {
+      "name": "reference_fasta_index",
+      "label": "reference fasta index",
+      "help": "Fasta index file for the reference genome input BAMs were aligned to (see GATK reference bundles)",
+      "class": "file",
+      "optional": false
+    },
+    {
+      "name": "reference_fasta_dict",
+      "label": "reference fasta dict",
+      "help": "Dict file for the reference genome input BAMs were aligned to (see GATK reference bundles)",
+      "class": "file",
+      "optional": false
+    },
+    {
+      "name": "intervals_list",
+      "label": "Intervals list",
+      "help": "File (*.bed, *.list) containing genomic intervals for Haplotype Caller",
+      "class": "file",
       "optional": false
     }
   ],
   "outputSpec": [
     {
-      "name": "output",
-      "label": "label",
-      "help": "help",
-      "class": "array:file"
+      "name": "gvcf",
+      "label": "GVCF",
+      "help": "GVCF file from HaplotypeCaller",
+      "class": "file",
+      "patterns": ["*.g.vcf"]
+    },
+    {
+      "name": "gvcf_index",
+      "label": "GVCF index",
+      "help": "Index file for GVCF from HaplotypeCaller",
+      "class": "file",
+      "patterns": ["*.g.vcf.idx"]
     }
   ],
   "runSpec": {
@@ -35,14 +80,14 @@
     ]
   },
   "details": {
-    "GATK4 release": "-",
+    "GATK4 release": "v4.0.9.0",
     "github release": "v1.0"
   },
   "regionalOptions": {
     "aws:us-east-1": {
       "systemRequirements": {
         "main": {
-          "instanceType": "mem2_ssd1_x4"
+          "instanceType": "mem1_ssd2_x4"
         }
       }
     }
