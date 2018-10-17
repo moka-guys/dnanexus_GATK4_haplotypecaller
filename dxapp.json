@@ -1,6 +1,6 @@
 {
-  "name": "Title",
-  "title": "Title",
+  "name": "GATK4_HaplotypeCaller",
+  "title": "GATK4 HaplotypeCaller",
   "summary": "-",
   "tags": [
     "VariantCalling"
@@ -80,9 +80,10 @@
     ]
   },
   "details": {
-    "GATK4 release": "v4.0.9.0",
-    "github release": "v1.0"
+    "github release": "v1.0",
+    "GATK4 release": "v4.0.9.0"
   },
+  "ignoreReuse": false,
   "regionalOptions": {
     "aws:us-east-1": {
       "systemRequirements": {
