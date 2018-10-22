@@ -6,6 +6,11 @@ set -e -x -o pipefail
 # Download input data
 dx-download-all-inputs
 
+# Move reference genome inputs to the same directory
+mv ${reference_fasta_index_path} ${reference_fasta_dict_path} $(dirname $reference_fasta_path)
+# Move BAM index file to the same directory
+mv ${input_bam_index_path} $(dirname $input_bam_path)
+
 # Set variables and functions for dx-docker
 home_dir=/home/dnanexus
 docker_dir=/gatk/sandbox
@@ -20,14 +25,15 @@ function docker_path(){
 docker_reference_fasta_path=$(docker_path $reference_fasta_path)
 docker_input_bam_path=$(docker_path $input_bam_path)
 docker_intervals_list_path=$(docker_path $intervals_list_path)
+docker_input_bam_prefix=${input_bam_prefix}
 
 # Pull GATK docker to workstation
 dx-docker pull broadinstitute/gatk:4.0.9.0
 
 # Call Haplotype Caller
 dx-docker run -v /home/dnanexus/:${docker_dir} broadinstitute/gatk:4.0.9.0 gatk HaplotypeCaller \
-  -R sandbox/${docker_reference_fasta_path} -I sandbox/${docker_input_bam_path} \
-  -O sandbox/${docker_input_bam_name}.g.vcf -ERC GVCF -L sandbox/${docker_intervals_list_path}
+  -R ${docker_reference_fasta_path} -I ${docker_input_bam_path} \
+  -O ${docker_dir}/${docker_input_bam_prefix}.g.vcf -ERC GVCF -L ${docker_intervals_list_path}
 
 # Create output directories and move respective files
 gvcf_out="out/gvcf"
