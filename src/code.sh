@@ -3,37 +3,52 @@
 # -e = exit on error; -x = output each line that is executed to log; -o pipefail = throw an error if there's an error in pipeline
 set -e -x -o pipefail
 
-# Download input data
-dx-download-all-inputs
+function manage_reference_data(){
+	# Move files to home directory (/home/dnanexus) on the worker. Unzip first if .gz is suffix.
+	# Input Args:
+    #    1: A reference genome file (fasta, dict or index)
+	#    2: A suffix for the output. Written to the home directory using the reference fasta prefix.
+	# Example: 
+	#    manage_reference_data input.fasta.gz .fasta
+	#    (creates)>>> /home/dnanexus/input.fasta
 
-# Move reference genome inputs to the same directory
-mv ${reference_fasta_index_path} ${reference_fasta_dict_path} $(dirname $reference_fasta_path)
-# Move BAM index file to the same directory
-mv ${input_bam_index_path} $(dirname $input_bam_path)
-
-# Set variables and functions for dx-docker
-home_dir=/home/dnanexus
-docker_dir=/gatk/sandbox
-
-function docker_path(){
-	# Replaces the home directory in a given string with the docker directory path. 
-	# Affords for correct dx_helper variables in mounted docker containers.
-	input_string=$1
-	echo $input_string | sed -e "s,$home_dir,$docker_dir,g"
+    # Set input arguments to variables
+    input_file=${1}
+    output_suffix=${2}
+    # If input file ends with *.gz suffix, unzip to the home directory.
+    if [[ $input_file == *.gz ]]; then
+        gunzip -c $input_file > ${HOME}/${reference_fasta_prefix}${2}
+    # Else move input file to the home directory with suffix
+	mv $input_file ${HOME}/${reference_fasta_prefix}${2}
 }
 
-docker_reference_fasta_path=$(docker_path $reference_fasta_path)
-docker_input_bam_path=$(docker_path $input_bam_path)
-docker_intervals_list_path=$(docker_path $intervals_list_path)
-docker_input_bam_prefix=${input_bam_prefix}
+# Download input data
+dx-download-all-inputs
 
 # Pull GATK docker to workstation
 dx-docker pull broadinstitute/gatk:4.0.9.0
 
+# Move BAM file, BAM index and intervals list files to the home directory
+mv ${input_bam_index_path} ${input_bam_path} ${intervals_list_path} $HOME
+# Move reference data to $HOME directory. If any files end with "*.gz", unzip first.
+manage_reference_data ${reference_fasta_path} .fasta
+manage_reference_data ${reference_fasta_index_path} .fasta.fai
+manage_reference_data ${reference_fasta_dict_path} .dict
+
+# Set flag for GVCF mode if input option gvcf_mode is set to true
+if [ $gvcf_mode = true ] ; then
+    gvcf_opt="-ERC GVCF"
+else
+    gvcf_opt=""
+fi
+
 # Call Haplotype Caller
-dx-docker run -v /home/dnanexus/:${docker_dir} broadinstitute/gatk:4.0.9.0 gatk HaplotypeCaller \
-  -R ${docker_reference_fasta_path} -I ${docker_input_bam_path} \
-  -O ${docker_dir}/${docker_input_bam_prefix}.g.vcf -ERC GVCF -L ${docker_intervals_list_path}
+dx-docker run -v /home/dnanexus/:/gatk/sandbox broadinstitute/gatk:4.0.9.0 gatk HaplotypeCaller \
+  -R /gatk/sandbox/${reference_fasta_prefix}.fasta \
+  -I /gatk/sandbox/${input_bam_name} \
+  -O /gatk/sandbox/${input_bam_prefix}.g.vcf \
+  -L /gatk/sandbox/${intervals_list_name} \
+  ${gvcf_opt} ${extra_opts}
 
 # Create output directories and move respective files
 gvcf_out="out/gvcf"

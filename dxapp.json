@@ -50,7 +50,21 @@
       "help": "File (*.bed, *.list) containing genomic intervals for Haplotype Caller",
       "class": "file",
       "optional": false
-    }
+    },
+    {
+      "name": "gvcf_mode",
+      "label": "GVCF mode bool",
+      "help": "A boolean to set the HaplotypeCaller to GVCF mode",
+      "class": "boolean",
+      "default": true
+    },
+    {
+      "name": "extra_opts",
+      "label": "Extra Options",
+      "help": "Additional options to pass to GATK Haplotypecaller",
+      "class": "string",
+      "optional": true
+    }    
   ],
   "outputSpec": [
     {
