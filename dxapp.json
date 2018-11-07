@@ -1,10 +1,13 @@
 {
-  "name": "GATK4_HaplotypeCaller",
-  "title": "GATK4 HaplotypeCaller",
-  "summary": "-",
+  "name": "gatk4_haplotypecaller_v1.0",
+  "title": "GATK HaplotypeCaller",
+  "summary": "Run HaplotypeCaller from GATK",
   "tags": [
     "VariantCalling"
   ],
+  "properties": {
+    "github release": "v1.0"
+  },
   "dxapi": "1.0.0",
   "inputSpec": [
     {
@@ -86,8 +89,13 @@
     "file": "src/code.sh",
     "release": "14.04",
     "interpreter": "bash",
-    "distribution": "Ubuntu"
-  },
+    "distribution": "Ubuntu",
+    "assetDepends": [
+      {
+        "id": "record-FPV32zj0jy1Qz76v41Z4V0J1"
+        }
+      ]
+    },
   "access": {
     "network": [
       "*"

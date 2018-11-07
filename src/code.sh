@@ -16,10 +16,12 @@ function manage_reference_data(){
     input_file=${1}
     output_suffix=${2}
     # If input file ends with *.gz suffix, unzip to the home directory.
-    if [[ $input_file == *.gz ]]; then
-        gunzip -c $input_file > ${HOME}/${reference_fasta_prefix}${2}
-    # Else move input file to the home directory with suffix
-	mv $input_file ${HOME}/${reference_fasta_prefix}${2}
+    if [[ ${input_file} == *.gz ]]; then
+        gunzip -c ${input_file} > ${HOME}/${reference_fasta_prefix}${2}
+	else
+		# Else move input file to the home directory with suffix
+		mv $input_file ${HOME}/${reference_fasta_prefix}${2}
+	fi
 }
 
 # Download input data
@@ -43,7 +45,8 @@ else
 fi
 
 # Call Haplotype Caller
-dx-docker run -v /home/dnanexus/:/gatk/sandbox broadinstitute/gatk:4.0.9.0 gatk HaplotypeCaller \
+# Uses the GATK4 v4.0.9.0 docker image (IMAGE ID : 68b475015074), passed to the appliation via the assetDepends key in dxapp.json
+dx-docker run -v /home/dnanexus/:/gatk/sandbox 68b475015074 gatk HaplotypeCaller \
   -R /gatk/sandbox/${reference_fasta_prefix}.fasta \
   -I /gatk/sandbox/${input_bam_name} \
   -O /gatk/sandbox/${input_bam_prefix}.g.vcf \
