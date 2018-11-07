@@ -27,9 +27,6 @@ function manage_reference_data(){
 # Download input data
 dx-download-all-inputs
 
-# Pull GATK docker to workstation
-dx-docker pull broadinstitute/gatk:4.0.9.0
-
 # Move BAM file, BAM index and intervals list files to the home directory
 mv ${input_bam_index_path} ${input_bam_path} ${intervals_list_path} $HOME
 # Move reference data to $HOME directory. If any files end with "*.gz", unzip first.
